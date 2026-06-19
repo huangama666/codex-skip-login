@@ -1,0 +1,29 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<svg width="1024" height="1024" viewBox="0 0 1024 1024" fill="none" xmlns="http://www.w3.org/2000/svg">
+  <title>Codex+国产模型免登</title>
+  <defs>
+    <linearGradient id="bg" x1="0" y1="0" x2="1024" y2="1024" gradientUnits="userSpaceOnUse">
+      <stop offset="0" stop-color="#1a1a1a"/>
+      <stop offset="1" stop-color="#0d0d0d"/>
+    </linearGradient>
+  </defs>
+
+  <!-- 圆角背景 -->
+  <rect x="64" y="64" width="896" height="896" rx="200" fill="url(#bg)"/>
+
+  <!-- 盾牌外框 - 代表安全/免登 -->
+  <path d="M512 180L260 300V520C260 680 370 830 512 880C654 830 764 680 764 520V300L512 180Z"
+        stroke="#ffffff" stroke-width="48" fill="none" stroke-linejoin="round"/>
+
+  <!-- 解锁图标 - 打开的锁 -->
+  <rect x="420" y="500" width="184" height="150" rx="20" stroke="#ffffff" stroke-width="36" fill="none"/>
+  <path d="M460 500V420C460 380 480 340 512 340C544 340 564 380 564 420"
+        stroke="#ffffff" stroke-width="36" stroke-linecap="round" fill="none"/>
+
+  <!-- 锁孔 -->
+  <circle cx="512" cy="565" r="20" fill="#ffffff"/>
+  <rect x="504" y="565" width="16" height="40" rx="8" fill="#ffffff"/>
+
+  <!-- 闪电 - 代表快速接入 -->
+  <path d="M680 200L640 340H720L660 480" stroke="#ffffff" stroke-width="28" stroke-linecap="round" stroke-linejoin="round" fill="none"/>
+</svg>
