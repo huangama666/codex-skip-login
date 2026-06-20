@@ -1,0 +1,13 @@
+.DS_Store
+__pycache__/
+*.py[cod]
+.pytest_cache/
+.venv/
+dist/
+build/
+assets/app-icon.iconset/
+*.egg-info/
+Codex Switch.app/
+*.log
+*.bak
+*.bak2
