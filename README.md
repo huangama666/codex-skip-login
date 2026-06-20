@@ -1,60 +1,119 @@
-# Codex 自定义模型
+# Codex+国产模型免登
 
-一个只做三件事的 macOS 工具：
+一个用于 macOS Codex Desktop 的自定义模型配置工具。通过图形界面填写 API 地址、模型 ID 和 API Key，即可将 Codex 切换到 OpenAI 兼容的自定义模型服务。
 
-1. 按 Codex `model_provider` 配置接入一个自定义模型；
-2. 可选设置 `requires_openai_auth = false`，跳过 ChatGPT 登录；
-3. 可选地把 Codex Responses API 请求适配为上游 Chat Completions API。
+## 功能
 
-## 图形界面
+- 接入 OpenAI Responses API 兼容服务
+- 将 Codex Responses 请求适配为上游 Chat Completions 请求
+- 可选跳过 ChatGPT 登录，默认不启用
+- 一键恢复 Codex 官方 ChatGPT 登录模式
+- 保存并回填上次使用的 API 地址、模型和协议选项
+- 自动备份修改前的 Codex 配置
+
+## 系统要求
+
+- macOS 13 或更高版本
+- 已安装 Codex Desktop
+- 使用自定义模型时，需要准备 API 地址、模型 ID 和 API Key
+
+## 下载和启动
+
+从 [Releases](https://github.com/huangama666/codex-skip-login/releases/latest) 下载 `Codex-Skip-Login-macOS.zip`，解压后双击 `Codex+国产模型免登.app`。
+
+也可以将 App 移动到用户应用目录：
 
 ```bash
-bash scripts/package-app.sh
+mkdir -p ~/Applications
+mv "Codex+国产模型免登.app" ~/Applications/
 open ~/Applications/Codex+国产模型免登.app
 ```
 
-填写 API 地址、模型 ID 和 API Key。如果上游只有 `/v1/chat/completions`，勾选协议适配。
+## 使用方法
 
-## 生成的核心配置
+### 自定义模型
 
-```toml
-model = "your-model-name"
-model_provider = "custom"
+1. 打开“自定义模型免登”页签。
+2. 填写 API 地址、模型 ID 和 API Key。
+3. 如果上游只提供 `/v1/chat/completions`，勾选“上游仅支持 Chat Completions”。
+4. 如果不希望使用 ChatGPT 登录，勾选“跳过 ChatGPT 登录”。该选项默认不勾选。
+5. 点击“应用并重启 Codex”。
 
-[model_providers.custom]
-name = "Custom Model"
-base_url = "https://api.example.com/v1"
-experimental_bearer_token = "your-api-key"
-models = ["your-model-name"]
-wire_api = "responses"
-requires_openai_auth = false
-```
+启用协议适配后，Codex 会请求本机 `http://127.0.0.1:17638/v1`，本地适配器再把请求转换后发送到用户填写的上游地址。
 
-“跳过 ChatGPT 登录”默认不勾选；勾选后才会生成上面的 `requires_openai_auth = false`，否则写入 `true`。
+### 恢复官方登录
 
-启用协议适配时，`base_url` 会指向本机 `http://127.0.0.1:17638/v1`，本地服务再调用用户填写的 `/v1/chat/completions`。
+1. 打开“恢复官方登录”页签。
+2. 填写需要使用的官方模型，或保留默认值。
+3. 点击“恢复官方登录并重启 Codex”。
 
-这套配置与 v0.5.1 的接入路径一致：Codex 始终按 Responses API 请求，自定义上游如果只支持 Chat Completions，则由本地适配器转换协议。API Key 同时保存在权限为 `0600` 的状态文件中；为了兼容 Codex Desktop，自定义 provider 使用 `experimental_bearer_token`，因此 `config.toml` 内也会包含明文 Key。
+自定义 API 配置会被保留，之后仍可重新切回自定义模型。
 
-> 注意：把自定义模型写入 `models_cache.json` 并不能保证它出现在 Codex Desktop 自带的模型下拉框中。是否展示由当前 Codex Desktop 的内部模型目录决定；本工具通过 `model`、`model_provider` 和 provider 的 `models` 配置让实际请求使用指定模型。
-
-## CLI
+## 从源码安装
 
 ```bash
-printf '%s\n' "$API_KEY" | codex-skip-login local \
+git clone https://github.com/huangama666/codex-skip-login.git
+cd codex-skip-login
+bash scripts/install.sh
+open ~/Applications/Codex+国产模型免登.app
+```
+
+安装脚本会同时安装：
+
+- App：`~/Applications/Codex+国产模型免登.app`
+- CLI：`~/.local/bin/codex-skip-login`
+- 运行文件：`~/.local/share/codex-skip-login`
+
+## CLI 使用
+
+```bash
+printf '%s\n' "$API_KEY" | ~/.local/bin/codex-skip-login local \
   --base-url https://api.example.com/v1 \
   --model your-model-name \
   --api-key-stdin \
   --chat-adapter \
   --skip-login \
   --restart-codex
-
-codex-skip-login status
 ```
 
-## 安全修改范围
+查看当前状态：
 
-- 修改：`~/.codex/config.toml`
-- 保存：`~/.codex/codex-switch-state.json`
-- 可选安装：`~/Library/LaunchAgents/com.huangama.codex-skip-login.adapter.plist`
-- 不修改：Codex 会话 JSONL、SQLite、Claude Code 配置和 `auth.json`
+```bash
+~/.local/bin/codex-skip-login status
+```
+
+恢复官方登录：
+
+```bash
+~/.local/bin/codex-skip-login official --restart-codex
+```
+
+## 配置文件
+
+工具会使用以下文件：
+
+- `~/.codex/config.toml`：Codex Provider、模型和协议配置
+- `~/.codex/auth.json`：保留原有 ChatGPT Token，并记录自定义 API Key
+- `~/.codex/codex-switch-state.json`：保存工具界面状态
+- `~/.codex/codex-switch-model-catalog.json`：自定义模型目录
+- `~/Library/LaunchAgents/com.huangama.codex-skip-login.adapter.plist`：协议适配服务
+
+修改前的配置会备份到 `~/.codex/backups/`。
+
+> 为兼容 Codex Desktop，自定义 API Key 会写入 `config.toml` 的 `experimental_bearer_token`。请勿公开分享自己的 `~/.codex/config.toml`、`auth.json` 或状态文件。
+
+## 关于模型下拉框
+
+Codex Desktop 的原生模型下拉框由其内部模型目录控制。自定义模型即使已经正确配置并能够发起请求，也不一定会出现在原生下拉框中；实际请求模型以 `config.toml` 中的 `model` 和 `model_provider` 为准。
+
+## 卸载
+
+```bash
+bash scripts/uninstall.sh
+```
+
+卸载脚本会删除 App、CLI 和协议适配服务，但会保留 `~/.codex` 中的用户配置与备份。
+
+## License
+
+[MIT](LICENSE)
