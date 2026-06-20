@@ -1746,7 +1746,7 @@ def build_parser() -> argparse.ArgumentParser:
     configure.add_argument("--custom-model-name", help="Display name for the custom model.")
     configure.add_argument("--official-model", help=f"Official Codex default model. Default: saved setting or {DEFAULT_OFFICIAL_MODEL}")
     configure.add_argument("--default-provider", choices=("openai", CUSTOM_PROVIDER_ID), help="Default Codex provider after saving. Defaults to saved setting or openai.")
-    configure.add_argument("--models", help="Comma-separated list of custom models to register (e.g. 'glm-5.2-max,deepseek-v3,qwen-max'). All will be available in Codex model picker.")
+    configure.add_argument("--models", help="Comma-separated list of custom models to register (e.g. 'model-a,model-b'). All will be available in Codex model picker.")
     configure.add_argument("--chat-adapter", action="store_true", help="Route Codex Responses API traffic through the local chat-completions adapter.")
     configure.add_argument("--restart-codex", action="store_true", help="Gracefully quit and reopen Codex.app after saving.")
     configure.set_defaults(func=configure_codex)
